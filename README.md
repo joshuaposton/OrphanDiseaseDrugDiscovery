@@ -53,7 +53,7 @@ OrphaMine uses **AI embeddings** from public biomedical data to:
 git clone https://github.com/YOUR_USERNAME/orphamine.git
 cd orphamine
 
-### 2. Set up a virtual environment
+ 2. Set up a virtual environment
 python -m venv venv
 venv\Scripts\activate     # On Windows
 # source venv/bin/activate   # On macOS/Linux

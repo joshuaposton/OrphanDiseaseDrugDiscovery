@@ -63,6 +63,10 @@ def main():
     ),
     axis=1
 )
+    filtered["PubMed Badge"] = filtered["pubmed_articles"].apply(
+    lambda x: "🔥 High Signal" if x >= 10 else ("🟡 Moderate" if x >= 3 else "🔘 Low")
+)
+
         
 
 
@@ -79,8 +83,10 @@ def main():
     display_df = filtered.rename(columns={
     "compound_rank": "Rank",
     "compound_name": "Compound Name",
-    "similarity_score": "Score"
-    })[["Rank", "Compound Name", "Score", "ChEMBL", "PubMed"]]
+    "similarity_score": "Score",
+    "pubmed_articles": "Articles"
+    })[["Rank", "Compound Name", "Score", "Articles", "ChEMBL", "PubMed"]]
+
 
     st.write(display_df.to_markdown(index=False), unsafe_allow_html=True)
 

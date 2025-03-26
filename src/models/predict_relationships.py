@@ -2,6 +2,14 @@ import numpy as np
 import pandas as pd
 from sklearn.metrics.pairwise import cosine_similarity
 import os
+import sys
+
+ROOT_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
+if ROOT_DIR not in sys.path:
+    sys.path.append(ROOT_DIR)
+
+from src.utils.pubmed_utils import get_pubmed_article_count
+
 
 # Input paths
 DISEASE_EMBEDDINGS = os.path.join("data_files", "disease_embeddings.npy")
@@ -35,12 +43,15 @@ def rank_compound_matches(d_embs, d_names, c_embs, c_ids, compound_df, top_n):
             name = compound_df.loc[compound_df["molecule_chembl_id"] == chembl_id, "pref_name"].values
             name = name[0] if len(name) > 0 else "N/A"
 
+            pubmed_count = get_pubmed_article_count(name)
+
             results.append({
                 "disease": disease,
                 "compound_rank": rank,
                 "compound_chembl_id": chembl_id,
                 "compound_name": name,
-                "similarity_score": sim_scores[idx]
+                "similarity_score": sim_scores[idx],
+                "pubmed_articles": pubmed_count
             })
 
     return pd.DataFrame(results)
