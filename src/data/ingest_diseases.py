@@ -1,82 +1,27 @@
-import requests
+import xml.etree.ElementTree as ET
 import pandas as pd
-import os
 
-# Orphadata API endpoint to get all rare diseases with their names
+# Path to your en_product4.xml file
+xml_path = "src/data/en_product4.xml"  # change this if needed
+output_csv = "data_files/disease_list.csv"
 
-OUTPUT_CSV = os.path.join("data_files", "disease_list.csv")
+def parse_orphanet_diseases(xml_file):
+    tree = ET.parse(xml_file)
+    root = tree.getroot()
 
-# Constructing a realistic list of rare and orphan diseases from trusted public domain sources
-rare_diseases = [
-    "Duchenne muscular dystrophy",
-    "Cystic fibrosis",
-    "Spinal muscular atrophy",
-    "Fabry disease",
-    "Gaucher disease",
-    "Amyotrophic lateral sclerosis",
-    "Huntington disease",
-    "Batten disease",
-    "Sickle cell anemia",
-    "Dravet syndrome",
-    "Leigh syndrome",
-    "Rett syndrome",
-    "Tay-Sachs disease",
-    "Prader-Willi syndrome",
-    "Angelman syndrome",
-    "Krabbe disease",
-    "Pompe disease",
-    "Metachromatic leukodystrophy",
-    "Canavan disease",
-    "X-linked adrenoleukodystrophy",
-    "Niemann-Pick disease",
-    "Alkaptonuria",
-    "Alström syndrome",
-    "Ataxia-telangiectasia",
-    "Autosomal dominant optic atrophy",
-    "CHARGE syndrome",
-    "Congenital insensitivity to pain",
-    "Cri du chat syndrome",
-    "Dandy-Walker malformation",
-    "Edwards syndrome",
-    "Familial Mediterranean fever",
-    "Hemophilia A",
-    "Joubert syndrome",
-    "Maple syrup urine disease",
-    "Menkes disease",
-    "Mucopolysaccharidosis I",
-    "Neurofibromatosis type 1",
-    "Patau syndrome",
-    "Phenylketonuria",
-    "Smith-Lemli-Opitz syndrome",
-    "Tuberous sclerosis",
-    "Wolfram syndrome",
-    "Wilson disease",
-    "Zellweger syndrome",
-    "Osteogenesis imperfecta",
-    "Thalassemia",
-    "Alpha-1 antitrypsin deficiency",
-    "Hereditary angioedema",
-    "Bardet-Biedl syndrome",
-    "Ehlers-Danlos syndrome",
-    "Ellis-van Creveld syndrome",
-    "Hypophosphatasia",
-    "Lesch-Nyhan syndrome",
-    "Meckel-Gruber syndrome",
-    "Mucolipidosis type IV",
-    "Refsum disease",
-    "Sandhoff disease",
-    "Sanfilippo syndrome",
-    "Seckel syndrome",
-    "Shwachman-Diamond syndrome",
-    "Stargardt disease",
-    "Treacher Collins syndrome",
-    "Trisomy 18",
-    "Ullrich congenital muscular dystrophy",
-    "Usher syndrome",
-    "Von Hippel-Lindau disease"
-]
+    diseases = []
+    for disorder in root.findall(".//Disorder"):
+        name_tag = disorder.find(".//Name")
+        if name_tag is not None and name_tag.text:
+            diseases.append(name_tag.text.strip())
 
-df = pd.DataFrame({"name": sorted(set(rare_diseases))})
+    return sorted(set(diseases))
 
-df.to_csv(OUTPUT_CSV, index=False)
+def main():
+    diseases = parse_orphanet_diseases(xml_path)
+    df = pd.DataFrame({"name": diseases})
+    df.to_csv(output_csv, index=False)
+    print(f"✅ Parsed and saved {len(diseases)} orphan diseases to {output_csv}")
 
+if __name__ == "__main__":
+    main()
